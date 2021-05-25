@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <memory>
 
 /**
  * getData это функция, которую вызывает библиотека curl
@@ -14,10 +15,11 @@
  * нам дают возможность передать этой функции какой-то
  * аргумент для аутпута
  */
-size_t getData(char* buffer, size_t itemSize, size_t itemCount, void* dest)
+ size_t getData(char* buffer, size_t itemSize, size_t itemCount, void* dest)
 {
+    //std::cout << "getData call\n";
     size_t bytes = itemSize * itemCount;
-    std::string* str = [std::string*]dest;
+    std::string* str = (std::string*)dest;
     str->assign(buffer, bytes);
     return bytes;
 }
@@ -54,13 +56,13 @@ Loadresult Pageloader::load(const std::string& url)
         exit(-1);
     }
 
-    std::string contents
+    std::string* contents = new std::string;
 
     //set options
     curl_easy_setup(curl, CURLOPT_URL, url.c_str());
     curl_easy_setup(curl, CURLOPT_WRITEFUNCTION, getData);
-    curl_easy_setup(curl, CURLOPT_WRITEDATA, (void*)(&contents));
-
+    curl_easy_setup(curl, CURLOPT_WRITEDATA, (void*)contents);
+    curl_easy_setup(curl, CURLOPT_FOLLOWLOCATION, 0);    
     /**
      * В строчках  curl_easy_setup... задаём опции CURL-у
      * 1)curl_easy_setup(curl, CURLOPT_URL, url.c_str());
@@ -107,5 +109,5 @@ Loadresult Pageloader::load(const std::string& url)
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &curlinfoResponseCode);
 
     curl_easy_cleanup(curl);
-    return LoadResult(contents, curlinfoResponseCode);
+    return LoadResult(std::shared_ptr<std::string>(contents), curlinfoResponseCode);
 }
