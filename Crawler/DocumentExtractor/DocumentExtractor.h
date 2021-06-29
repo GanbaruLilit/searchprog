@@ -1,6 +1,6 @@
 #ifndef  DOCUMENT_EXTRACTOR
 #define  DOCUMENT_EXTRACTOR
-#include "../HtmlDocument/HymlDocument.h"
+#include "../HtmlDocument/HtmlDocument.h"
 #incldue <DocumentInfo.h>
 class DocumentExtractor
 {
